@@ -12,7 +12,7 @@ load_dotenv()
 PROVIDER = "deepseek"
 API_KEY = os.getenv("DEEPSEEK_API_KEY")
 MODEL = "deepseek-chat"
-TARGET_DEPTH = 0  # Change this: 0, 1, 2, 3, 5
+TARGET_DEPTH = 1  # Change this: 0, 1, 2, 3, 5
 NUM_PROBLEMS = 50
 RESULTS_FILE = f"results_proofwriter_depth{TARGET_DEPTH}.json"
 DELAY_BETWEEN_PROBLEMS = 2
@@ -29,7 +29,7 @@ else:
 
 # Load dataset
 # Use the deepest dataset and filter by target depth
-# depth-5 contains problems up to depth 5, so it covers 0-5
+# depth-5 dataset contains problems up to depth 5, so we filter by TARGET_DEPTH
 loader = ProofWriterLoader("data/proofwriter/depth-5/meta-dev.jsonl", target_depth=TARGET_DEPTH)
 print(f"Loaded {loader.get_problem_count()} problems from ProofWriter {TARGET_DEPTH}")
 print(f"Running problems {start_from + 1} to {min(NUM_PROBLEMS, loader.get_problem_count())}...\n")
