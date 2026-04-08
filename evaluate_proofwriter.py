@@ -12,7 +12,7 @@ load_dotenv()
 PROVIDER = "deepseek"
 API_KEY = os.getenv("DEEPSEEK_API_KEY")
 MODEL = "deepseek-chat"
-TARGET_DEPTH = 1  # Change this: 0, 1, 2, 3, 5
+TARGET_DEPTH = 5  # Change this: 0, 1, 2, 3, 5
 NUM_PROBLEMS = 50
 RESULTS_FILE = f"results_proofwriter_depth{TARGET_DEPTH}.json"
 DELAY_BETWEEN_PROBLEMS = 2
