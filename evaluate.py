@@ -9,14 +9,13 @@ from src.utils import extract_result, normalize_label
 load_dotenv()
 
 # Configuration
-PROVIDER = "deepseek"
-API_KEY = os.getenv("DEEPSEEK_API_KEY")
-MODEL = "deepseek-chat"
-NUM_PROBLEMS = 10  # Start small for testing
-RESULTS_FILE = "results_folio.json"
+PROVIDER = "gemini"
+API_KEY = os.getenv("GEMINI_API_KEY")
+MODEL = "gemini-2.5-flash"
+NUM_PROBLEMS = 204
+RESULTS_FILE = "results_folio_gemini_flash.json"
 DELAY_BETWEEN_PROBLEMS = 5  # seconds between problems
 
-# Load existing results if resuming
 if os.path.exists(RESULTS_FILE):
     with open(RESULTS_FILE, 'r', encoding='utf-8') as f:
         results = json.load(f)
@@ -26,12 +25,10 @@ else:
     results = []
     start_from = 0
 
-# Load dataset
 loader = FOLIOLoader("data/folio/folio-validation.jsonl")
 print(f"Loaded {loader.get_problem_count()} problems from FOLIO")
 print(f"Running problems {start_from + 1} to {min(NUM_PROBLEMS, loader.get_problem_count())}...\n")
 
-# Setup pipelines
 prolog_pipeline = HybridPrologPipeline(PROVIDER, API_KEY, MODEL)
 python_pipeline = HybridPythonPipeline(PROVIDER, API_KEY, MODEL)
 cot_pipeline = LLMOnlyPipeline(PROVIDER, API_KEY, MODEL)
@@ -51,7 +48,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
     gold = normalize_label(problem["gold_label"])
     entry = {"index": i, "gold_label": gold, "conclusion": problem["conclusion"]}
 
-    # Pipeline 1: LLM + Prolog
     print("\n  [Prolog] Running...")
     try:
         prolog_result = prolog_pipeline.run(problem["problem_text"])
@@ -68,7 +64,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
 
     time.sleep(DELAY_BETWEEN_PROBLEMS)
 
-    # Pipeline 2: LLM + Python
     print("  [Python] Running...")
     try:
         python_result = python_pipeline.run(problem["problem_text"])
@@ -85,7 +80,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
 
     time.sleep(DELAY_BETWEEN_PROBLEMS)
 
-    # Pipeline 3: LLM Only (CoT)
     print("  [CoT] Running...")
     try:
         cot_result = cot_pipeline.run(problem["problem_text"])
@@ -104,7 +98,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
 
     time.sleep(DELAY_BETWEEN_PROBLEMS)
 
-# Summary
 print("\n" + "=" * 60)
 print("SUMMARY")
 print("=" * 60)

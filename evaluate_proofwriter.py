@@ -9,12 +9,12 @@ from src.utils import extract_result, normalize_label
 load_dotenv()
 
 # Configuration
-PROVIDER = "deepseek"
-API_KEY = os.getenv("DEEPSEEK_API_KEY")
-MODEL = "deepseek-chat"
-TARGET_DEPTH = 5  # Change this: 0, 1, 2, 3, 5
+PROVIDER = "openai"
+API_KEY = os.getenv("OPENAI_API_KEY")
+MODEL = "gpt-5"
+TARGET_DEPTH = 5
 NUM_PROBLEMS = 50
-RESULTS_FILE = f"results_proofwriter_depth{TARGET_DEPTH}.json"
+RESULTS_FILE = f"results_proofwriter_gpt5_depth{TARGET_DEPTH}.json"
 DELAY_BETWEEN_PROBLEMS = 2
 
 # Load existing results if resuming
@@ -27,14 +27,10 @@ else:
     results = []
     start_from = 0
 
-# Load dataset
-# Use the deepest dataset and filter by target depth
-# depth-5 dataset contains problems up to depth 5, so we filter by TARGET_DEPTH
 loader = ProofWriterLoader("data/proofwriter/depth-5/meta-dev.jsonl", target_depth=TARGET_DEPTH)
 print(f"Loaded {loader.get_problem_count()} problems from ProofWriter {TARGET_DEPTH}")
 print(f"Running problems {start_from + 1} to {min(NUM_PROBLEMS, loader.get_problem_count())}...\n")
 
-# Setup pipelines
 prolog_pipeline = HybridPrologPipeline(PROVIDER, API_KEY, MODEL)
 python_pipeline = HybridPythonPipeline(PROVIDER, API_KEY, MODEL)
 cot_pipeline = LLMOnlyPipeline(PROVIDER, API_KEY, MODEL)
@@ -59,7 +55,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
         "question": problem["question"]
     }
 
-    # Pipeline 1: LLM + Prolog
     print("\n  [Prolog] Running...")
     try:
         prolog_result = prolog_pipeline.run(problem["problem_text"])
@@ -76,7 +71,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
 
     time.sleep(DELAY_BETWEEN_PROBLEMS)
 
-    # Pipeline 2: LLM + Python
     print("  [Python] Running...")
     try:
         python_result = python_pipeline.run(problem["problem_text"])
@@ -96,7 +90,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
 
     time.sleep(DELAY_BETWEEN_PROBLEMS)
 
-    # Pipeline 3: LLM Only (CoT)
     print("  [CoT] Running...")
     try:
         cot_result = cot_pipeline.run(problem["problem_text"])
@@ -115,7 +108,6 @@ for i in range(start_from, min(NUM_PROBLEMS, loader.get_problem_count())):
 
     time.sleep(DELAY_BETWEEN_PROBLEMS)
 
-# Summary
 print("\n" + "=" * 60)
 print("SUMMARY")
 print("=" * 60)
@@ -128,7 +120,6 @@ for pipeline_name in ["prolog", "python", "cot"]:
     accuracy = correct / total * 100 if total > 0 else 0
     print(f"{pipeline_name.upper():>8}: {correct}/{total} correct ({accuracy:.1f}%) | {failed} failed")
 
-# Accuracy by depth
 print("\nAccuracy by reasoning depth:")
 depths = sorted(set(r["depth"] for r in results))
 for d in depths:

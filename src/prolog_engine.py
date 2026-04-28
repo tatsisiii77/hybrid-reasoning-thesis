@@ -10,7 +10,6 @@ class PrologEngine:
         Run Prolog code with directives.
         Returns: (success: bool, output: str, error: str or None)
         """
-        # Add error handler that catches existence_error and outputs UNCERTAIN
         wrapper = """
 :- set_prolog_flag(unknown, fail).
 :- use_module(library(error)).
@@ -32,15 +31,12 @@ class PrologEngine:
             output = process.stdout.strip()
             errors = process.stderr.strip()
 
-            # Check if we got a valid RESULT in output
             if "RESULT:" in output:
                 return True, output, None
 
-            # If no RESULT and there are errors, return error
             if errors:
                 return False, output, errors[:500]  # Truncate long errors
 
-            # No result and no errors - treat as UNCERTAIN
             return True, "RESULT: UNCERTAIN", None
 
         except subprocess.TimeoutExpired:

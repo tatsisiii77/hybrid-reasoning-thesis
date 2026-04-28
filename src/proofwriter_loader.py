@@ -14,7 +14,6 @@ class ProofWriterLoader:
             for line in f:
                 self.rulebases.append(json.loads(line))
 
-        # Flatten: each problem is one (theory, question) pair
         self.problems = []
         for rulebase in self.rulebases:
             theory = rulebase["theory"]
@@ -48,7 +47,6 @@ Conclusion: {item['question']}
 
 Is the conclusion True, False, or Unknown based on the premises?"""
 
-        # Normalize answer to TRUE/FALSE/UNCERTAIN format
         ans = item["answer"]
         if ans is True:
             gold = "TRUE"
