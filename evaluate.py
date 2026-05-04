@@ -14,7 +14,7 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 MODEL = "gemini-2.5-flash"
 NUM_PROBLEMS = 204
 RESULTS_FILE = "results_folio_gemini_flash.json"
-DELAY_BETWEEN_PROBLEMS = 5  # seconds between problems
+DELAY_BETWEEN_PROBLEMS = 5
 
 if os.path.exists(RESULTS_FILE):
     with open(RESULTS_FILE, 'r', encoding='utf-8') as f:
