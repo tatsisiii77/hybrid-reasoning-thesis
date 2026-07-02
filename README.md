@@ -4,7 +4,9 @@ Diploma thesis — Department of Electrical and Computer Engineering,
 Hellenic Mediterranean University (HMU).
 
 **Author:** Ilias Tatsios, TH20566
+
 **Supervisor:** Prof. Sotiris Batsakis  
+
 **July 2026**
 
 ## Overview
